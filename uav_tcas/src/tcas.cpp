@@ -10,24 +10,27 @@
 #include<iostream>
 #include<stdlib.h>
 #include<vector>
+// #include<matplot/matplot.h>
 // #include<ros/ros.h>
 // #include<std_msgs>
 #include<math.h>
 using namespace std;
 #define R_EARTH 6378137 // Radius of Earth in metres
 void straight_flight_predict(float, float, float);
-void turning_flight_predict(float, float);
+void turning_flight_predict(float, float, float, float);
 void search_volume_predict();
 
-//phi_pred0 and lambda_pred0 are the aircraft position
-double phi_pred0 = 50, lambda_pred0 = 50;
-float psi_c = 0;
+//------------------------------------------------------------
+// phi_ac and lambda_ac = aircraft position
+double phi_ac = 50, lambda_ac = 50;
+// -----------------------------------------------------------
+float phi_c = 0;
 float dx[100];
 vector<float> phi_pred, lambda_pred;
 // taking one sample time to be 0.01 seconds
 // t_t is the True Track angle, given by TT = arctan(ve/vn), where ve and vn are the aircraft's velocities in the East and North directions resp.
 // The true track expresses the direction of the velocity vector with respect to the true (not the magnetic) north direction.
-const float del_t_pred = 1, t_t = psi_c;
+const float del_t_pred = 1, t_t = phi_c;
 
 void straight_flight_predict(const float t_pred, float horizontal_vel, float altitude){
     //t_pred = Look ahead time
@@ -58,53 +61,51 @@ void straight_flight_predict(const float t_pred, float horizontal_vel, float alt
     }   
 }
 
-
-void turning_flight_predict(const float t_pred, float horizontal_vel, float altitude, float yaw_rate){
-    float psi_ac = phi_pred0, lambda_ac = lambda_pred0, t_t = psi_c;
+//delta_phi->aircraft's yaw rate
+void turning_flight_predict(const float t_pred, float delta_phi, float horizontal_vel, float altitude){
+    float phi_pred0 = phi_ac, lambda_pred0 = lambda_ac, phi_c = t_t;
     int N = t_pred/del_t_pred;
-    vector<float> psi_pred, lambda_pred;
-    float alpha, delta_psi;
-    float x[2] = {0, 0};
+    vector<float> phi_pred, lambda_pred;
+    float alpha; //alpha->centre angle
+    float x[2] = {0, 0}; // to store the position vector of the curved path, containing x_n and x_e --> North and East position vector of the aircraft respectively
     int i = 0;
-    //delta_psi->aircraft's yaw rate
-    //alpha->centre angle
-    psi_pred.clear();
-    lambda_pred.clear();
+    phi_pred.clear();
+    lambda_pred.clear(); // clear out any pre-existing data for now
 
-    psi_pred.push_back(0);
+    phi_pred.push_back(0); // initialize
     lambda_pred.push_back(0);
     
     for(int i=1; i<N; i++){
-        alpha = psi_c - M_PI/2;
-        psi_c = psi_c + delta_psi*del_t_pred;
+        alpha = phi_c - M_PI/2;
+        phi_c = phi_c + delta_phi*del_t_pred;
 
-        dx[0] = (horizontal_vel*(-sin(alpha))*del_t_pred) - 0.5*horizontal_vel*delta_psi*cos(alpha)*del_t_pred*del_t_pred; // dx[0] is 'dn'
-        dx[1] = (horizontal_vel*(-cos(alpha))*del_t_pred) - 0.5*horizontal_vel*delta_psi*sin(alpha)*del_t_pred*del_t_pred; //dx[1] is 'de'
-
+        dx[0] = (horizontal_vel*(-sin(alpha))*del_t_pred) - 0.5*horizontal_vel*delta_phi*cos(alpha)*del_t_pred*del_t_pred; // dx[0] is 'dn'
+        dx[1] = (horizontal_vel*(-cos(alpha))*del_t_pred) - 0.5*horizontal_vel*delta_phi*sin(alpha)*del_t_pred*del_t_pred; //dx[1] is 'de'
         float dist_dx = pow(dx[0]*dx[0] + dx[1]*dx[1], 0.5);
 
         //new predicted position
         float a = dist_dx/(R_EARTH+altitude);
         float b = atan(dx[1]/dx[0]);
 
-        if(i>0 && i<51){
-            psi_pred.push_back(psi_pred[i-1]+asin(psi_pred[i-1]*cos(a) + cos(psi_pred[i-1])*sin(a)*cos(b)));
-            lambda_pred.push_back(lambda_pred[i-1]+atan((sin(b)*sin(a)*cos(psi_pred[i-1]))/(cos(a)-sin(psi_pred[i-1]*sin(psi_pred[i])))));
-        }
-        else{
-            psi_pred.erase(psi_pred.begin());
-        }
+        // if(i>0 && i<51){
+        phi_pred.push_back(phi_pred[i-1]+asin(phi_pred[i-1]*cos(a) + cos(phi_pred[i-1])*sin(a)*cos(b)));
+        lambda_pred.push_back(lambda_pred[i-1]+atan((sin(b)*sin(a)*cos(phi_pred[i-1]))/(cos(a)-sin(phi_pred[i-1]*sin(phi_pred[i])))));
+        // }
+        // else{
+            // phi_pred.erase(phi_pred.begin());
+        // }
+        std::cout<<phi_pred.back()<<" "<<lambda_pred.back()<<" "<<a<<" "<<b<<endl;
     }
-     std::cout<<"phi_pred elements:";
-    for(const auto& element : phi_pred){
-        std::cout<< element<<" ";
-        std::cout<<endl;
-    }
-    std::cout<<"lambda_pred elements:";
-    for(const auto& element : lambda_pred){
-        std::cout<< element<<" ";
-        std::cout<<endl;
-    } 
+    //  std::cout<<"phi_pred elements:";
+    // for(const auto& element : phi_pred){
+    //     std::cout<< element<<" ";
+    //     std::cout<<endl;
+    // }
+    // std::cout<<"lambda_pred elements:";
+    // for(const auto& element : lambda_pred){
+    //     std::cout<< element<<" ";
+    //     std::cout<<endl;
+    // } 
 }
 
 // void search_volume_predict(){
@@ -120,29 +121,8 @@ int main(int argc, char** argv){
     // while(ros::ok()){
 
     // }
-    straight_flight_predict(30,100,10000);
-    turning_flight_predict(100,10000);
+    // straight_flight_predict(30,100,10000);
+    turning_flight_predict(100,20, 2000, 10000);
 
     return 0;
 }
-
-
-// SRTM DATA EXTRACTION:
-// def get_sample(filename, n, e):
-//     i = 1201 - int(round(n / 3, 0))
-//     j = int(round(e / 3, 0))
-//     with open(filename, "rb") as f:
-//         f.seek(((i - 1) * 1201 + (j - 1)) * 2)  # go to the right spot,
-//         buf = f.read(2)  # read two bytes and convert them:
-//         val = struct.unpack('>h', buf)  # ">h" is a signed two byte integer
-//         if not val == -32768:  # the not-a-valid-sample value
-//             return val
-//         else:
-//             return None
-
-// if __name__ == "__main__":
-//     # elevation at 18°27'17.0"N 73°55'22.1"E
-//     n = 27 * 60 + 0
-//     e = 55 * 60 + 22.1
-//     tile = "/home/sagar/Desktop/UAV-Avionics/srtm data/N18E073.hgt"
-//     print(get_sample(tile, n, e))

@@ -17,6 +17,8 @@ include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
 )
-
+add_subdirectory(matplotplusplus)
 add_executable(node src/tcas.cpp)
+
+target_link_libraries(node PUBLIC matplot)
 target_link_libraries(node ${catkin_LIBRARIES})
