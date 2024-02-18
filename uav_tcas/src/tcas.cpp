@@ -1,29 +1,24 @@
-/*  Ground Terrain Collision Avoidance 
-    things to do:
-    1. understand DAIDALUS
-    2. read other related papers and form a summary of sorts
-    3. code the high-level functions first and sort out the lower-level details later
-
+/*  
+    Author: Sagar Chotalia
+    email: sagarchotalia2@gmail.com
 */
 
 #include<stdio.h>
 #include<iostream>
 #include<stdlib.h>
 #include<vector>
-// #include<matplot/matplot.h>
-// #include<ros/ros.h>
-// #include<std_msgs>
 #include<math.h>
 using namespace std;
 #define R_EARTH 6378137 // Radius of Earth in metres
 void straight_flight_predict(float, float, float);
 void turning_flight_predict(float, float, float, float);
-void search_volume_predict();
+void search_volume_predict(int);
 
 //------------------------------------------------------------
-// phi_ac and lambda_ac = aircraft position
+// latitude (ϕ), longitude (λ) and altitude (h). The latitude and longitude together define the horizontal position.
 double phi_ac = 50, lambda_ac = 50;
 // -----------------------------------------------------------
+vector<float, float> departure_search_width;
 float phi_c = 0;
 float dx[100];
 vector<float> phi_pred, lambda_pred;
@@ -71,10 +66,9 @@ void turning_flight_predict(const float t_pred, float delta_phi, float horizonta
     int i = 0;
     phi_pred.clear();
     lambda_pred.clear(); // clear out any pre-existing data for now
-
     phi_pred.push_back(0); // initialize
     lambda_pred.push_back(0);
-    
+
     for(int i=1; i<N; i++){
         alpha = phi_c - M_PI/2;
         phi_c = phi_c + delta_phi*del_t_pred;
@@ -84,7 +78,7 @@ void turning_flight_predict(const float t_pred, float delta_phi, float horizonta
         float dist_dx = pow(dx[0]*dx[0] + dx[1]*dx[1], 0.5);
 
         //new predicted position
-        float a = dist_dx/(R_EARTH+altitude);
+        float a = dist_dx/(R_EARTH + altitude);
         float b = atan(dx[1]/dx[0]);
 
         // if(i>0 && i<51){
@@ -96,21 +90,38 @@ void turning_flight_predict(const float t_pred, float delta_phi, float horizonta
         // }
         std::cout<<phi_pred.back()<<" "<<lambda_pred.back()<<" "<<a<<" "<<b<<endl;
     }
-    //  std::cout<<"phi_pred elements:";
-    // for(const auto& element : phi_pred){
-    //     std::cout<< element<<" ";
-    //     std::cout<<endl;
-    // }
-    // std::cout<<"lambda_pred elements:";
-    // for(const auto& element : lambda_pred){
-    //     std::cout<< element<<" ";
-    //     std::cout<<endl;
-    // } 
 }
+// The search volume consists of a computed look ahead distance(LAD), a lateral
+// distance on both sides of the airplane’s ight path, and a specified look down
+// distance based upon the airplane’s vertical flight path. Search volume
+// should vary as a function of: phase of flight, distance from runway,
+// required obstacle clearance (ROC).
+void search_volume_predict(int flight_phase, float  ){
 
-// void search_volume_predict(){
+    // nautical miles = metres*1852
+    //Flightphase           Basic Across Track Width        in metres
+    // Departure            0.50 NM                         926
+    // Enroute              0.75 NM                         1389
+    // Approach             0.25 NM                         463
+    
+    // Figure out the lead angle calculations
+    if(flight_phase == 1){
+        // The departure phase is dened from power-up of the system until the aircraft 
+        // reaches 1500 ft above the departure runway (which is the nearest runway)
+        // the protection area begins at the Departure End of Runway (DER) with a total width of
+        // 300 m (0.16 NM) centered around the runway center line. It then splays at an angle
+        // of 15◦ on each side. This would give a total width of approx. 2.8 NM after 5 NM
+        departure_search_width.push_back(phi_ac)
 
-// }
+    }
+    else if(flight_phase == 2){
+        // The enroute phase is dened as when the aircraft is more than 15 NM away from the
+        // nearest runway or whenever the conditions for the other phases are not met.
+    }
+
+
+
+}
 
 
 int main(int argc, char** argv){
@@ -121,8 +132,8 @@ int main(int argc, char** argv){
     // while(ros::ok()){
 
     // }
-    // straight_flight_predict(30,100,10000);
-    turning_flight_predict(100,20, 2000, 10000);
+    straight_flight_predict(30,100,10000);
+    // turning_flight_predict(100,20, 2000, 10000);
 
     return 0;
 }
