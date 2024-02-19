@@ -13,6 +13,8 @@ using namespace std;
 void straight_flight_predict(float, float, float);
 void turning_flight_predict(float, float, float, float);
 void search_volume_predict(int);
+float dist_to_latlong();
+float latlong_to_dist();
 
 //------------------------------------------------------------
 // latitude (ϕ), longitude (λ) and altitude (h). The latitude and longitude together define the horizontal position.
@@ -122,7 +124,17 @@ void search_volume_predict(int flight_phase, float  ){
 
 
 }
+// This function converts a distance from a particular point to latitude, longitude and altitude measurements.
+// Important for calculating the search volume distances as the aircraft moves in real-time. Depends on aircraft headin directiong.
+float dist_to_latlong(double latitude, double longitude, float altitude, double required_distance, float heading){
 
+    float desired_directions[2] = {heading+90, heading-90}; // Finding out the two directions perpendicular from the aircraft heading
+
+
+
+}
+
+float latlong_to_dist(){}
 
 int main(int argc, char** argv){
 
