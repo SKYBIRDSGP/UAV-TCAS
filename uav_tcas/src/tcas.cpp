@@ -113,8 +113,8 @@ void search_volume_predict(int flight_phase, float  ){
         // the protection area begins at the Departure End of Runway (DER) with a total width of
         // 300 m (0.16 NM) centered around the runway center line. It then splays at an angle
         // of 15◦ on each side. This would give a total width of approx. 2.8 NM after 5 NM
-        departure_search_width.push_back(phi_ac)
-
+        departure_search_width.push_back(phi_ac);
+    
     }
     else if(flight_phase == 2){
         // The enroute phase is dened as when the aircraft is more than 15 NM away from the
