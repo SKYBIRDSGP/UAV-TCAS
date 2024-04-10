@@ -21,7 +21,7 @@ cout<<"Enter the Value of Bank angle for escape : ";
 cin>>phi_esc;
 float R = pow(Vned_h,2)/(G*phi_esc);
 float LAD = A +2*R + D ; 
-cout<<"The look ahead distance, LAD for velocity component in N-E plane = "<<Vned_h<<", and bank angle "<<phi_esc<<" is : "<<LAD<<" meters."<<endl;
+cout<<"The look ahead distance, LAD for velocity component in N-E plane = "<<Vned_h<<", Km/s and bank angle "<<phi_esc<<" radians is : "<<LAD<<" meters."<<endl;
 cout<<"----------------------------------------------------------------------------------------------------------------------------------"<<endl;
     
 return 0;
