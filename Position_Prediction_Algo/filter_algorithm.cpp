@@ -4,11 +4,9 @@
 #include<vector>
 #include<math.h>
 #include<ctime>
+#include"config.h"
 
 using namespace std;
-float x_pred;
-const float a = 0.08;
-const float β = 0.002;
 
 int main(){
     //------------------ a_β_filter_algorithm--------------------------------------------------
@@ -22,7 +20,6 @@ int main(){
     float x_mes = 50 ;
     float dT = 2;
     float r ;
-    float x = 10;
     int i = 1;
 
     while(i <=30 ){

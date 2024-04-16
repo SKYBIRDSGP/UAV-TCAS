@@ -1,10 +1,9 @@
 #include <iostream>
 #include <stdio.h>
+#include"config.h"
 #include <cmath>
 
 using namespace std;
-# define R_earth 6378000    // Radius of earth in meters along the equator
-# define G = 9.81           // Gravity vector in m/s^2
 # define phi_ac 3.14/3          // Latitude in radians
 # define lambda_ac 3.14/6       // Longitude in radians
 # define h_ac 5000              // ALtitude in meters 
