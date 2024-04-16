@@ -27,7 +27,7 @@ int main(){
         v_curr = v_prev ;
         x_pred = x_est + dT*v_prev ;
         // STEP2 : Calculation of a Residual position
-        r = x - x_pred;
+        r = x_mes - x_pred;
         // STEP3: Measurement update (correction):
         x_est = x_pred + a *r;
         v_curr = v_prev + β*r/dT ;
