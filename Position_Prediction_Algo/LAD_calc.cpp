@@ -20,7 +20,7 @@ float A = Vned_h * (float)t_pilot ;           // It is the max distance that the
 cout<<"----------------------------------------------------------------------------------------------------------------------------------"<<endl;
 float R = pow(Vned_h,2)/(G*tan(phi_esc*3.14/180));
 float LAD = A +2*R + D ; 
-cout<<"The look ahead distance, LAD for velocity component in N-E plane = "<<Vned_h<<" m/s, and bank angle "<<phi_esc<<" radians is : "<<LAD<<" meters."<<endl;
+cout<<"The look ahead distance, LAD for velocity component in N-E plane = "<<Vned_h<<" m/s, and bank angle "<<phi_esc<<" degrees is : "<<LAD<<" meters."<<endl;
 cout<<"----------------------------------------------------------------------------------------------------------------------------------"<<endl;
     
 return 0;
