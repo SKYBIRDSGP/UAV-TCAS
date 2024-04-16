@@ -32,9 +32,9 @@ int main(){
         x_est_curr = x_pred + a*r;
         v_est_curr = v_pred + β*r/dT ;
         cout<<"-------------------------------------------------------------"<<endl;
-        cout<<"The predicted position in the next "<< dT*i<<" seconds is : "<<x_mes+x_pred<<endl;
-        cout<<"The estimated position in the next "<< dT*i<<" seconds is : "<<x_mes+x_est_curr<<endl;
-        cout<<"The estimated velocity in the next "<< dT*i<<" seconds is : "<<v_est_curr<<endl;
+        cout<<"The predicted position in the next "<< dT*i<<" seconds is : "<<x_mes+x_pred<<" meters."<<endl;
+        cout<<"The estimated position in the next "<< dT*i<<" seconds is : "<<x_mes+x_est_curr<<" meters"<<endl;
+        cout<<"The estimated velocity in the next "<< dT*i<<" seconds is : "<<v_est_curr<<" meters/second."<<endl;
 
         x_est_prev = x_est_curr;
         v_est_prev = v_est_curr;
